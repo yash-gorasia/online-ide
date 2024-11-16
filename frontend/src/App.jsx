@@ -1,12 +1,13 @@
 import React from 'react'
+import Landing from './components/Landing'
 
-import CodeEditorWindow from './components/CodeEditorWindow'
+
 function App() {
   
 
   return (
     <>
-      <CodeEditorWindow />
+      <Landing />
     </>
   )
 }
