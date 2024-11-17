@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from "dotenv";
 import cors from "cors";
+import fileRoutes from "./routes/fileRoutes.js";
 
 //utiles
 import connectDB from "./config/db.js";
@@ -19,6 +20,8 @@ app.use(cors({
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use("/api/fileStruct", fileRoutes)
 
 app.listen(port, () => {
     console.log(`server is running on ${process.env.PORT}`);

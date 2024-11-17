@@ -4,7 +4,7 @@ import monacoThemes from 'monaco-themes/themes/themelist'
 import { customStyles } from '../constants/customStyles.js'
 
 
-const ThemeDropdown = ({ handleThemeChange, theme }) => {
+const ThemeDropdown = ({ handleThemeChange, theme }) => {            
     return (
         <div>
             <Select
