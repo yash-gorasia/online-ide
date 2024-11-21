@@ -2,7 +2,11 @@ import fs from 'fs/promises';
 import path from 'path';
 
 async function generateFileTree(directory) {
-    const tree = {};
+    const root = {
+        name: path.basename(directory),
+        isFolder: true,
+        items: []
+    };
 
     async function buildTree(currentDir, currentTree) {
         const files = await fs.readdir(currentDir);
@@ -12,23 +16,33 @@ async function generateFileTree(directory) {
             const stat = await fs.stat(filePath);
 
             if (stat.isDirectory()) {
-                currentTree[file] = {};
-                await buildTree(filePath, currentTree[file]);
+                const dirObject = {
+                    name: file,
+                    isFolder: true,
+                    items: []
+                };
+                currentTree.push(dirObject);
+                // Recurse into the directory
+                await buildTree(filePath, dirObject.items);
             } else {
-                currentTree[file] = null;
+                const fileObject = {
+                    name: file,
+                    isFolder: false,
+                    items: []
+                };
+                currentTree.push(fileObject);
             }
         }
     }
 
-    await buildTree(directory, tree);
-    return tree;
+    await buildTree(directory, root.items);
+    return root;
 }
 
-// Controller function to handle the request
 async function getFileTree(req, res) {
     try {
-        const fileTree = await generateFileTree('./user'); // Adjust the directory as needed
-        return res.json({ tree: fileTree });
+        const fileTree = await generateFileTree('./root');
+        return res.json({ root: fileTree });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: 'Failed to generate file tree' });
