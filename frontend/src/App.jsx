@@ -1,5 +1,7 @@
 import React from 'react'
 import Landing from './components/Landing'
+import FileDirectory from './components/FileDirectory'
+
 
 
 function App() {
@@ -7,7 +9,8 @@ function App() {
 
   return (
     <>
-      <Landing />
+      {/* <Landing /> */}
+      <FileDirectory />
     </>
   )
 }

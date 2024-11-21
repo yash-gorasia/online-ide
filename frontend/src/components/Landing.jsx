@@ -164,30 +164,30 @@ const Landing = () => {
     }
   };
 
-  // const handleThemeChange = (th) => {
-  //   const theme = th;
-  //   console.log("theme...", theme);
+  const handleThemeChange = (th) => {
+    const theme = th;
+    console.log("theme...", theme);
 
-  //   if (["light", "vs-dark"].includes(theme.value)) {
-  //     setTheme(theme);  // Directly set for default themes
-  //   } else {
-  //     defineTheme(theme.value).then((_) => {
-  //       setTheme(theme); // Update state after theme is defined
-  //     }).catch(error => {
-  //       console.error("Error loading theme:", error);
-  //     });
-  //   }
-  // };
+    if (["light", "vs-dark"].includes(theme.value)) {
+      setTheme(theme);  // Directly set for default themes
+    } else {
+      defineTheme(theme.value).then((_) => {
+        setTheme(theme); // Update state after theme is defined
+      }).catch(error => {
+        console.error("Error loading theme:", error);
+      });
+    }
+  };
 
 
-  // useEffect(() => {
-  //   defineTheme("oceanic-next").then((_) => {
-  //     //  monaco.editor.defineTheme("oceanic-next");
-  //     setTheme({ value: "oceanic-next", label: "Oceanic Next" })
-  //   }
+  useEffect(() => {
+    defineTheme("oceanic-next").then((_) => {
+      //  monaco.editor.defineTheme("oceanic-next");
+      setTheme({ value: "oceanic-next", label: "Oceanic Next" })
+    }
 
-  //   );
-  // }, []);
+    );
+  }, []);
 
 
   const showSuccessToast = (msg) => {
@@ -230,9 +230,9 @@ const Landing = () => {
         <div className="px-4 py-2">
           <LanguagesDropdown onSelectChange={onSelectChange} />
         </div>
-        {/* <div className="px-4 py-2">
+        <div className="px-4 py-2">
           <ThemeDropdown handleThemeChange={handleThemeChange} theme={theme} />
-        </div> */}
+        </div>
       </div>
       <div className="flex flex-row space-x-4 items-start px-4 py-4">
         <div className="flex flex-col w-full h-full justify-start items-end">
@@ -240,7 +240,7 @@ const Landing = () => {
             code={code}
             onChange={onChange}
             language={language?.value}
-            // theme={theme.value}
+            theme={theme.value}
           />
         </div>
 

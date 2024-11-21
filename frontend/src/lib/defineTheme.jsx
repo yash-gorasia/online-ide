@@ -1,5 +1,4 @@
-
-import * as monaco from 'monaco-editor';
+import { loader } from "@monaco-editor/react";
 
 const monacoThemes = {
     active4d: "Active4D",
@@ -54,27 +53,31 @@ const monacoThemes = {
 
 const defineTheme = (theme) => {
     return new Promise((resolve, reject) => {
-        // Dynamically construct the theme file path
         const themeFilePath = `/themes/${monacoThemes[theme]}.json`;
+        Promise.all([ 
+            loader.init(),
+            fetch(themeFilePath)
+                .then(response => {
+                    if (!response.ok) {
+                        return reject(new Error(`Failed to load theme from ${themeFilePath}`));
+                    }
+                    return response.json();
+                })
+        ])
+            // Dynamically construct the theme file path
 
-        fetch(themeFilePath)
-            .then(response => {
-                if (!response.ok) {
-                    return reject(new Error(`Failed to load theme from ${themeFilePath}`));
-                }
-                return response.json();
-            })
-            .then(data => {
+            .then(([monaco, data]) => {
                 // Define and set the Monaco theme dynamically
-                monaco.editor.defineTheme(theme, data); 
-                console.log(`${theme} theme loaded successfully`);               
+                monaco.editor.defineTheme(theme, data);
+                console.log(`${theme} theme loaded successfully`);
                 resolve(data);
+                console.log("data", data);
+
             })
             .catch(error => reject(error));
-            
-    });
-    
-};
 
+    });
+
+};
 
 export { defineTheme };
