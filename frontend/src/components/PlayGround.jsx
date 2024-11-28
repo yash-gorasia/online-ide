@@ -14,6 +14,7 @@ import CustomInput from "./CustomInput";
 import OutputDetails from "./OutputDetails";
 import ThemeDropdown from "./ThemeDropdown";
 import LanguagesDropdown from "./LanguagesDropdown";
+import FileDirectory from "./FileDirectory";
 
 import * as monaco from "monaco-editor";
 
@@ -226,7 +227,7 @@ const Landing = () => {
         draggable
         pauseOnHover
       />
-      <div className="flex flex-row">
+      <div className="flex flex-row ml-[16%]">
         <div className="px-4 py-2">
           <LanguagesDropdown onSelectChange={onSelectChange} />
         </div>
@@ -234,8 +235,14 @@ const Landing = () => {
           <ThemeDropdown handleThemeChange={handleThemeChange} theme={theme} />
         </div>
       </div>
-      <div className="flex flex-row space-x-4 items-start px-4 py-4">
-        <div className="flex flex-col w-full h-full justify-start items-end">
+      <div className="flex flex-row space-x-4 items-start px-4 py-4 h-full">
+        {/* File Directory */}
+        <div className="border-2 border-black z-10 rounded-md shadow-[5px_5px_0px_0px_rgba(0,0,0)] px-4 py-2 hover:shadow transition duration-200 bg-white flex-shrink-0 w-[15%] h-full overflow-auto">
+          <FileDirectory />
+        </div>
+
+        {/* Code Editor */}
+        <div className="flex flex-col w-full h-full">
           <CodeEditorWindow
             code={code}
             onChange={onChange}
@@ -244,7 +251,8 @@ const Landing = () => {
           />
         </div>
 
-        <div className="right-container flex flex-shrink-0 w-[30%] flex-col">
+        {/* Output and Controls */}
+        <div className="right-container flex flex-shrink-0 w-[25%] flex-col h-full ">
           <OutputWindow outputDetails={outputDetails} />
           <div className="flex flex-col items-end">
             <CustomInput
@@ -255,7 +263,7 @@ const Landing = () => {
               onClick={handleCompile}
               disabled={!code}
               className={classnames(
-                "mt-4 border-2 border-black z-10 rounded-md shadow-[5px_5px_0px_0px_rgba(0,0,0)] px-4 py-2 hover:shadow transition duration-200 bg-white flex-shrink-0",
+                "mt-4 border-2 border-black z-10 rounded-md shadow-[5px_5px_0px_0px_rgba(0,0,0)] px-4 py-2 hover:shadow transition duration-200 bg-white flex-shrink-0 overflow-auto",
                 !code ? "opacity-50" : ""
               )}
             >
@@ -265,6 +273,7 @@ const Landing = () => {
           {outputDetails && <OutputDetails outputDetails={outputDetails} />}
         </div>
       </div>
+
     </>
   );
 };

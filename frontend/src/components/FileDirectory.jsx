@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import useTraverseTree from '../hooks/useTraverseTree';
+import { FaFolder, FaFolderOpen, FaFolderPlus} from "react-icons/fa";
+import { FaFile, FaFileCirclePlus } from "react-icons/fa6";
+
+
 
 const FileDirectory = ({ fileStruct: initialFileStruct }) => {
   const [fileStruct, setFileStruct] = useState(initialFileStruct || {});
@@ -30,7 +34,6 @@ const FileDirectory = ({ fileStruct: initialFileStruct }) => {
   const handleNewFolder = (e, isFolder) => {
     e.stopPropagation();
     setExpand(true);
-
     setShowInput({
       visible: true,
       isFolder,
@@ -50,48 +53,59 @@ const FileDirectory = ({ fileStruct: initialFileStruct }) => {
     }
   };
 
-  if (fileStruct.isFolder) {
-    return (
-      <div className="mt-5 ml-5 border-l-2 border-zinc-800">
-        <div
-          className="folder cursor-pointer w-1/6"
-          onClick={() => setExpand(!expand)}
-        >
-          <span className="flex justify-between">
-            📁 {fileStruct.name}
-            <div className="flex gap-8">
-              <button onClick={(e) => handleNewFolder(e, true)}>Folder++</button>
-              <button onClick={(e) => handleNewFolder(e, false)}>File++</button>
-            </div>
-          </span>
+  return fileStruct.isFolder ? (
+    <div className=" border-l border-black pl-3">
+      <div
+        className="flex justify-between  items-center text-black hover:text-gray-800 cursor-pointer"
+        onClick={() => setExpand(!expand)}
+      >
+        <div className="flex items-center gap-2">
+          {expand ? <FaFolderOpen /> : <FaFolder />}
+          <span className="font-medium">{fileStruct.name}</span>
         </div>
-
-        {showInput.visible && (
-          <div>
-            <span>{showInput.isFolder ? '📁' : '📄'}</span>
-            <input
-              type="text"
-              onKeyDown={onAddNewFolder}
-              onBlur={() => setShowInput({ visible: false })}
-              autoFocus
-              className="input_conatainer border"
-            />
-          </div>
-        )}
-
-        {expand &&
-          fileStruct.items.map((folder) => (
-            <FileDirectory key={folder.name} fileStruct={folder} />
-          ))}
+        <div className="flex gap-6">
+          <button
+            onClick={(e) => handleNewFolder(e, true)}
+            className="hover:text-blue-400"
+            title="New Folder"
+          >
+            <FaFolderPlus />
+          </button>
+          <button
+            onClick={(e) => handleNewFolder(e, false)}
+            className="hover:text-green-400"
+            title="New File"
+          >
+            <FaFileCirclePlus />
+          </button>
+        </div>
       </div>
-    );
-  } else {
-    return (
-      <span className="file ml-5 border-l-2 border-zinc-800 cursor-pointer">
-        📄 {fileStruct.name} <br />
-      </span>
-    );
-  }
+
+      {showInput.visible && (
+        <div className="mt-2 flex items-center gap-2">
+          {showInput.isFolder ? <FaFolder /> : <FaFile />}
+          <input
+            type="text"
+            onKeyDown={onAddNewFolder}
+            onBlur={() => setShowInput({ visible: false })}
+            autoFocus
+            placeholder={showInput.isFolder ? "New Folder" : "New File"}
+            className="bg-transparent border-b border-gray-500 focus:outline-none focus:border-blue-400"
+          />
+        </div>
+      )}
+
+      {expand &&
+        fileStruct.items.map((folder) => (
+          <FileDirectory key={folder.name} fileStruct={folder} />
+        ))}
+    </div>
+  ) : (
+    <div className="ml-8 flex items-center text-black hover:text-gray-600 cursor-pointer">
+      <FaFile className="mr-2" />
+      <span>{fileStruct.name}</span>
+    </div>
+  );
 };
 
 export default FileDirectory;
