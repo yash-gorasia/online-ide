@@ -226,7 +226,7 @@ const Landing = () => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-      />
+      />    
       <div className="flex flex-row ml-[16%]">
         <div className="px-4 py-2">
           <LanguagesDropdown onSelectChange={onSelectChange} />
