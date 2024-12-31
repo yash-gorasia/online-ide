@@ -9,9 +9,9 @@ const GoogleLogin = () => {
         try {
             if (authResult['code']) {
                 const result = await googleAuth(authResult['code']);
-                const { email, name, profilePic } = result.data.user;
+                const { _id, email, name, profilePic } = result.data.user;
                 const token = result.data.token;
-                const obj = { email, name, profilePic, token };
+                const obj = { _id, email, name, profilePic, token };
                 localStorage.setItem('user-info', JSON.stringify(obj));
                 console.log("result data:", result.data.user);
                 navigate('/dashboard');

@@ -238,7 +238,7 @@ const Landing = () => {
       <div className="flex flex-row space-x-4 items-start px-4 py-4 h-full">
         {/* File Directory */}
         <div className="border-2 border-black z-10 rounded-md shadow-[5px_5px_0px_0px_rgba(0,0,0)] px-4 py-2 hover:shadow transition duration-200 bg-white flex-shrink-0 w-[15%] h-full overflow-auto">
-          <FileDirectory />
+          <FileDirectory/>
         </div>
 
         {/* Code Editor */}

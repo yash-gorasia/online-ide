@@ -1,10 +1,14 @@
 import express from 'express';
 import {
-    getFileTree
+    getFileTree,
+    deleteFileOrFolder,
+    createFileOrFolder
 } from "../controllers/fileController.js";
 
 const router = express.Router();
 
-router.get("/files", getFileTree);
+router.get("/getFiles/:userId", getFileTree);
+router.post("/createFile", createFileOrFolder);
+router.delete("/deleteFile/:id", deleteFileOrFolder);
 
 export default router;

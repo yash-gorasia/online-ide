@@ -4,9 +4,6 @@ import User from '../models/userModel.js';
 import jwt from 'jsonwebtoken';
 
 
-
-
-
 const googleLogin = async (req, res) => {
     try {
         const code = req.query.code;

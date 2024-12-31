@@ -1,52 +1,104 @@
-import fs from 'fs/promises';
 import path from 'path';
+import File from '../models/fileModel.js';
 
-async function generateFileTree(directory) {
-    const root = {
-        name: path.basename(directory),
-        isFolder: true,
-        items: []
-    };
-
-    async function buildTree(currentDir, currentTree) {
-        const files = await fs.readdir(currentDir);
-
-        for (const file of files) {
-            const filePath = path.join(currentDir, file);
-            const stat = await fs.stat(filePath);
-
-            if (stat.isDirectory()) {
-                const dirObject = {
-                    name: file,
-                    isFolder: true,
-                    items: []
-                };
-                currentTree.push(dirObject);
-                // Recurse into the directory
-                await buildTree(filePath, dirObject.items);
-            } else {
-                const fileObject = {
-                    name: file,
-                    isFolder: false,
-                    items: []
-                };
-                currentTree.push(fileObject);
-            }
-        }
-    }
-
-    await buildTree(directory, root.items);
-    return root;
-}
-
-async function getFileTree(req, res) {
+async function createFileOrFolder(req, res) {
     try {
-        const fileTree = await generateFileTree('./root');
-        return res.json({ root: fileTree });
+        const { userId, name, isFolder, parentId } = req.body;
+
+        // Find parent folder
+        const parent = parentId ? await File.findById(parentId) : null;
+
+        const parentPath = parent ? parent.path : '/';
+
+        // Create new file/folder
+        const newFile = await File.create({
+            user: userId,
+            name,
+            isFolder,
+            parent: parentId || null,
+            path: path.join(parentPath, name),
+            items: [],
+        });
+
+        // Update parent's items if it's a folder
+        if (parent && parent.isFolder) {
+            parent.items.push(newFile._id);
+            await parent.save();
+        }
+
+        res.status(201).json(newFile);
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ error: 'Failed to generate file tree' });
+        res.status(500).json({ error: 'Failed to create file or folder' });
     }
 }
 
-export { getFileTree };
+
+ async function getFileTree(req, res) {
+    try {
+        const { userId } = req.params;
+       
+    
+        // Find root folder for the user
+        const root = await File.findOne({ user: userId, parent: null });
+
+        if (!root) {
+            return res.status(404).json({ error: 'Root folder not found' });
+        }
+
+        async function buildTree(node) {
+            const children = await File.find({ parent: node._id });
+            const tree = {
+                _id: node._id,
+                name: node.name,
+                isFolder: node.isFolder,
+                items: [],
+            };
+            for (const child of children) {
+                if (child.isFolder) {
+                    tree.items.push(await buildTree(child));
+                } else {
+                    tree.items.push({_id:child._id, name: child.name, isFolder: false });
+                }
+            }
+            return tree;
+        }
+
+        const fileTree = await buildTree(root);
+        res.json(fileTree);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to retrieve file tree' });
+    }
+}
+
+ async function deleteFileOrFolder(req, res) {
+    try {
+        const { id } = req.params;
+
+        async function deleteRecursively(fileId) {
+            const file = await File.findById(fileId);
+            if (file.isFolder) {
+                const children = await File.find({ parent: fileId });
+                for (const child of children) {
+                    await deleteRecursively(child._id);
+                }
+            }
+            await File.findByIdAndDelete(fileId);
+        }
+
+        await deleteRecursively(id);
+        res.json({ message: 'File/Folder deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to delete file/folder' });
+    }
+}
+
+
+
+export {
+    getFileTree,
+    createFileOrFolder,
+    deleteFileOrFolder,
+};
