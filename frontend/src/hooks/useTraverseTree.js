@@ -1,51 +1,68 @@
+// src/hooks/useTraverseTree.js
 const useTraverseTree = () => {
-  const insertNode = (tree, parentId, name, isFolder, actualId, path = '') => {
+  // Insert a new node into the tree
+  const insertNode = (tree, parentId, node) => {
+    if (!tree) return tree;
+
     if (tree._id === parentId) {
-      const newPath = `${path}/${name}`;
       return {
         ...tree,
-        items: [
-          ...tree.items,
-          {
-            _id: actualId,
-            name: name,
-            isFolder,
-            parentId: tree._id,
-            path: newPath,
-            items: isFolder ? [] : null,
-          },
-        ],
+        items: [...tree.items, node],
       };
     }
 
-    const updatedItems = tree.items.map((child) =>
-      insertNode(child, parentId, name, isFolder, actualId, tree.path)
-    );
-
-    return {
-      ...tree,
-      items: updatedItems,
-    };
-  };
-
-  const deleteNode = (tree, id) => {
-    // If the current node matches the id, remove it by returning an empty object
-    if (tree._id === id) {
-      return {}; // Return an empty object instead of null
+    if (tree.items) {
+      return {
+        ...tree,
+        items: tree.items.map((item) => insertNode(item, parentId, node)),
+      };
     }
 
-    // Otherwise, recursively filter out the node with the matching id
-    const updatedItems = tree.items
-      .map((child) => deleteNode(child, id))
-      .filter((child) => Object.keys(child).length > 0); // Remove empty objects
-
-    return {
-      ...tree,
-      items: updatedItems,
-    };
+    return tree;
   };
 
-  return { insertNode, deleteNode };
+  // Delete a node from the tree
+  const deleteNode = (tree, nodeId) => {
+    if (!tree) return null;
+
+    if (tree._id === nodeId) {
+      return null;
+    }
+
+    if (tree.items && tree.items.length > 0) {
+      const newItems = tree.items.map((item) => deleteNode(item, nodeId)).filter((item) => item !== null);
+
+      return {
+        ...tree,
+        items: newItems,
+      };
+    }
+
+    return tree;
+  };
+
+  // Update a node's name in the tree
+  const updateNode = (tree, nodeId, newName) => {
+    if (!tree) return tree;
+
+    if (tree._id === nodeId) {
+      return {
+        ...tree,
+        name: newName,
+      };
+    }
+
+    if (tree.items) {
+      return {
+        ...tree,
+        items: tree.items.map((item) => updateNode(item, nodeId, newName)),
+      };
+    }
+
+    return tree;
+  };
+
+  return { insertNode, deleteNode, updateNode };
 };
 
 export default useTraverseTree;

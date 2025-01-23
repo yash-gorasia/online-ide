@@ -1,9 +1,10 @@
 import React from 'react'
+import FileExplorer from './FileExplorer'
 
 const Dashboard = () => {
   return (
     <div>
-      <h1>Dashboard Page</h1>
+      <FileExplorer />
     </div>
   )
 }

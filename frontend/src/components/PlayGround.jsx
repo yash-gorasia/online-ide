@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import CodeEditorWindow from "./CodeEditorWindow";
 import axios from "axios";
 import { classnames } from "../utils/general";
@@ -15,9 +15,10 @@ import OutputDetails from "./OutputDetails";
 import ThemeDropdown from "./ThemeDropdown";
 import LanguagesDropdown from "./LanguagesDropdown";
 import FileDirectory from "./FileDirectory";
+import FileExplorer from "./FileExplorer";
+import Tabs from "./Tabs";
 
 import * as monaco from "monaco-editor";
-
 
 const javascriptDefault = `/**
 * Problem: Binary Search: Search a sorted array for a target value.
@@ -56,6 +57,33 @@ const Landing = () => {
   const [processing, setProcessing] = useState(null);
   const [theme, setTheme] = useState("cobalt");
   const [language, setLanguage] = useState(languageOptions[0]);
+  const [fileExplorerWidth, setFileExplorerWidth] = useState(315);
+  const [activeEditorTabs, setActiveEditorTabs] = useState([]);
+  const [selectedTabId, setSelectedTabId] = useState(null);
+  const [selectedTabData, setSelectedTabData] = useState(null);
+
+  const isResizing = useRef(false);
+
+  const handleMouseDown = (e) => {
+    isResizing.current = true;
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isResizing.current) return;
+    const newWidth = e.clientX;
+    if (newWidth > 200 && newWidth < 500) {
+      // Set min and max width
+      setFileExplorerWidth(newWidth);
+    }
+  };
+
+  const handleMouseUp = () => {
+    isResizing.current = false;
+    document.removeEventListener("mousemove", handleMouseMove);
+    document.removeEventListener("mouseup", handleMouseUp);
+  };
 
   const enterPress = useKeyPress("Enter");
   const ctrlPress = useKeyPress("Control");
@@ -73,6 +101,11 @@ const Landing = () => {
     }
   }, [ctrlPress, enterPress]);
 
+  useEffect(() => {
+    const data = activeEditorTabs.find((tab) => tab.id === selectedTabId);
+    setSelectedTabData(data?.data || "");
+  }, [activeEditorTabs, selectedTabId]);
+
   const onChange = (action, data) => {
     switch (action) {
       case "code": {
@@ -84,6 +117,7 @@ const Landing = () => {
       }
     }
   };
+
   const handleCompile = () => {
     setProcessing(true);
     const formData = {
@@ -180,7 +214,6 @@ const Landing = () => {
     }
   };
 
-
   useEffect(() => {
     defineTheme("oceanic-next").then((_) => {
       //  monaco.editor.defineTheme("oceanic-next");
@@ -189,7 +222,6 @@ const Landing = () => {
 
     );
   }, []);
-
 
   const showSuccessToast = (msg) => {
     toast.success(msg || `Compiled Successfully!`, {
@@ -214,6 +246,17 @@ const Landing = () => {
     });
   };
 
+  const handleTabClick = (tabId) => {
+    setSelectedTabId(tabId);
+  };
+
+  const handleCloseTab = (tabId) => {
+    setActiveEditorTabs(activeEditorTabs.filter((tab) => tab.id !== tabId));
+    if (selectedTabId === tabId) {
+      setSelectedTabId(null);
+    }
+  };
+
   return (
     <>
       <ToastContainer
@@ -226,8 +269,8 @@ const Landing = () => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-      />    
-      <div className="flex flex-row ml-[16%]">
+      />
+      <div className="flex flex-row ml-[22%]">
         <div className="px-4 py-2">
           <LanguagesDropdown onSelectChange={onSelectChange} />
         </div>
@@ -237,14 +280,37 @@ const Landing = () => {
       </div>
       <div className="flex flex-row space-x-4 items-start px-4 py-4 h-full">
         {/* File Directory */}
-        <div className="border-2 border-black z-10 rounded-md shadow-[5px_5px_0px_0px_rgba(0,0,0)] px-4 py-2 hover:shadow transition duration-200 bg-white flex-shrink-0 w-[15%] h-full overflow-auto">
-          <FileDirectory/>
+        <div
+          className="relative border-2 border-black z-10 rounded-md shadow-[5px_5px_0px_0px_rgba(0,0,0)] hover:shadow transition duration-200 bg-white flex-shrink-0 overflow-auto"
+          style={{ width: fileExplorerWidth }}
+        >
+          <FileExplorer
+            handleActiveEditorTabs={setActiveEditorTabs}
+            setActiveEditorTabs={setActiveEditorTabs}
+            activeEditorTabs={activeEditorTabs}
+            setSelectedTabId={setSelectedTabId}
+          />
+          <div
+            className="absolute right-0 top-0 bottom-0 w-1.5 cursor-ew-resize hover:bg-gray-300"
+            onMouseDown={handleMouseDown}
+          />
         </div>
 
         {/* Code Editor */}
         <div className="flex flex-col w-full h-full">
+          <div className="flex">
+            {activeEditorTabs.map((tab) => (
+              <Tabs
+                key={tab.id}
+                tab={tab}
+                isSelected={selectedTabId === tab.id}
+                onClick={() => handleTabClick(tab.id)}
+                handleCloseTab={handleCloseTab}
+              />
+            ))}
+          </div>
           <CodeEditorWindow
-            code={code}
+            code={selectedTabData || code}
             onChange={onChange}
             language={language?.value}
             theme={theme.value}

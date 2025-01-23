@@ -8,6 +8,7 @@ const fileSchema = new mongoose.Schema(
         parent: { type: mongoose.Schema.Types.ObjectId, ref: 'File', default: null }, // Points to the parent
         path: { type: String, required: true }, // For storing the full path for easy lookup
         items: [{ type: mongoose.Schema.Types.ObjectId, ref: 'File' }], // Only for folders
+        content: { type: String, default: '' }, // Only for files
     },
     { timestamps: true }
 );
