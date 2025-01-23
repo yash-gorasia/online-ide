@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaFile, FaCross } from 'react-icons/fa'; 
+import { FaFile, FaRegWindowClose } from 'react-icons/fa'; 
 
 const Tabs = ({ tab, isSelected, onClick, handleCloseTab }) => {
   const activeClass = isSelected ? "bg-white text-vsdark-5" : "bg-transparent text-vsdark-4";
@@ -8,7 +8,7 @@ const Tabs = ({ tab, isSelected, onClick, handleCloseTab }) => {
     <div
       role="button"
       onClick={onClick}
-      className={`${activeClass} px-4 py-2 text- rounded-md  border-r border-vsdark-3 flex items-center gap-3 hover:bg-zinc-100 hover:text-vsdark-5`}
+      className={`${activeClass} ml-1 mb-2 px-3 py-1 border-2 border-black z-10 rounded-md shadow-[5px_5px_0px_0px_rgba(0,0,0)] hover:shadow transition duration-200 rounded-md flex items-center gap-3  hover:text-vsdark-5`}
     >
       <div className="flex items-center gap-1.5">
         <span className="flex items-center">
@@ -23,7 +23,7 @@ const Tabs = ({ tab, isSelected, onClick, handleCloseTab }) => {
           handleCloseTab(tab.id);
         }}
       >
-        <FaCross size={12} />
+        <FaRegWindowClose size={12} />
       </button>
     </div>
   );

@@ -314,6 +314,13 @@ const Landing = () => {
             onChange={onChange}
             language={language?.value}
             theme={theme.value}
+            height={
+              activeEditorTabs.length > 0
+                ? selectedTabId !== null
+                  ? "calc(100vh - 8rem)" // When a tab is active
+                  : "calc(100vh - 6rem)" // When no tab is selected but tabs exist
+                : "calc(100vh - 6rem)" // When no tabs exist
+            }
           />
         </div>
 
